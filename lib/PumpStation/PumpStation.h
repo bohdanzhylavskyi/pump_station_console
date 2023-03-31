@@ -75,7 +75,6 @@ public:
   bool is_global_blocking_conditions(){
     return (
       ((_mode == SENSOR_MODE) && !bitRead(_status_flags, ID_PSENSOR_OK_STATUS )) ||
-      !bitRead(_status_flags, ID_FLOAT_STATUS) ||
       (_critical_pressure_ADC > 110 && bitRead(_status_flags, ID_CRITICAL_PRESSURE_STATUS))
     );
   }
@@ -219,11 +218,6 @@ private:
         status_changed = true;
         }
       break;
-    }
-
-    if (bitRead(_status_flags, ID_FLOAT_STATUS) != digitalRead(_float_pin)){
-      _status_flags ^= (1 << ID_FLOAT_STATUS);
-      status_changed = true;
     }
 
     if (_critical_pressure_ADC > 110){ // 110 - в переводе около 0,12 бар

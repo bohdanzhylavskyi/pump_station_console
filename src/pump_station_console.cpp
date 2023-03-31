@@ -246,6 +246,7 @@ void process_display_statement(char scroll_dir = '0'){
   static TimerMs message_show_tmr(show_statement_duration * 1000, 0, 1);
   static TimerMs manual_scroll_tmr(show_statement_duration * 1000, 0, 1);
   static uint8_t current_page = 0;
+  uint8_t page_count = 6;
 
   if(!first_call && (!show_statement_noblock || message_show_tmr.tick()) && !ps.get_status_by_id(ID_GLOBAL_BLOCKING_STATUS)){
     first_call = true;
@@ -267,7 +268,7 @@ void process_display_statement(char scroll_dir = '0'){
       page_change_prd.start();
       message_show_tmr.setTime(show_statement_duration * 1000);
       message_show_tmr.start();
-      current_page = 2;
+      current_page = 0;
       DEBUG(F("display has started"))
     }
 
@@ -288,22 +289,22 @@ void process_display_statement(char scroll_dir = '0'){
 
       if(scroll_dir =='L') {
         if(current_page > 0) current_page --;
-          else current_page = 6;
+          else current_page = page_count - 1;
       }
 
       if(scroll_dir == '0' || scroll_dir == 'R') {
-        if(current_page < 6) current_page ++;
+        if(current_page < (page_count - 1)) current_page ++;
           else current_page = 0;
       }
 
       if(scroll_dir != '0' && manual_scroll_tmr.active()) manual_scroll_tmr.start();
 
-      if(current_page == 3 && ps.get_mode()!= PRELAY_MODE) current_page++;
-      if(current_page == 4 && ps.get_status_by_id(ID_PSENSOR_OK_STATUS)) current_page++;
-      if(current_page == 5 && !ps.get_status_by_id(ID_GLOBAL_BLOCKING_STATUS)) current_page ++;
-      if(current_page == 6 && !(time_until_deblock > 0) ) current_page = 0;
+      if(current_page == 2 && ps.get_mode()!= PRELAY_MODE) current_page++;
+      if(current_page == 3 && ps.get_status_by_id(ID_PSENSOR_OK_STATUS)) current_page++;
+      if(current_page == 4 && !ps.get_status_by_id(ID_GLOBAL_BLOCKING_STATUS)) current_page ++;
+      if(current_page == 5 && !(time_until_deblock > 0) ) current_page = 0;
       if((current_page == 0 || current_page == 1) &&
-        !ps.get_status_by_id(ID_PSENSOR_OK_STATUS)) current_page = 2;
+        !ps.get_status_by_id(ID_PSENSOR_OK_STATUS)) current_page = 3;
       }
 
     render_page(current_page);
@@ -551,25 +552,7 @@ void render_page(uint8_t page_num){
     lcd.print(ps.get_water_reserve_percent());
     lcd.print(F("%)"));
     break;
-
-    case 2:lcd.print(F("YPOBEH"));
-    lcd.write(byte(6));//Ь
-    lcd.print(F(" BOD"));
-    lcd.write(byte(3));//Ы
-    lcd.setCursor(0,1);
-    if(ps.get_status_by_id(ID_FLOAT_STATUS)){
-      lcd.print("B");
-      lcd.write(byte(3));//Ы
-      lcd.print(F("COK."));
-    }
-      else{
-        lcd.write('H');
-        lcd.write(byte(1));//И
-        lcd.print(F("3K."));
-      }
-    break;
-
-    case 3:lcd.print(F("PE"));
+    case 2:lcd.print(F("PE"));
     lcd.write(byte(4));//Л
     lcd.print(F("E DAB"));
     lcd.write(byte(4));//Л
@@ -586,7 +569,7 @@ void render_page(uint8_t page_num){
     lcd.write('.');
     break;
 
-    case 4:lcd.print(F("DAT4"));
+    case 3:lcd.print(F("DAT4"));
     lcd.write(byte(1));//И
     lcd.print("K");
     lcd.print(F(" DAB"));
@@ -602,7 +585,7 @@ void render_page(uint8_t page_num){
     lcd.print(F("PABEH"));
     break;
 
-    case 5:lcd.write(byte(2)); //Б
+    case 4:lcd.write(byte(2)); //Б
     lcd.write(byte(4));//Л
     lcd.print(F("OK"));
     lcd.write(byte(1)); //И
@@ -617,7 +600,7 @@ void render_page(uint8_t page_num){
     }
     break;
 
-    case 6:lcd.print(F("DO PA3"));
+    case 5:lcd.print(F("DO PA3"));
     lcd.write(byte(2)); //Б
     lcd.write(byte(4));//Л
     lcd.print(F("OK"));
