@@ -230,7 +230,7 @@ private:
           }
       }
 
-    if (bitRead(_status_flags, ID_PSENSOR_OK_STATUS) != (_current_pressure_ADC > 95 && _current_pressure_ADC < 920)){
+    if (bitRead(_status_flags, ID_PSENSOR_OK_STATUS) != (_current_pressure_ADC > 91 && _current_pressure_ADC < 920)){
       _status_flags ^= (1 << ID_PSENSOR_OK_STATUS);
       status_changed = true;
     }
